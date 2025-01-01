@@ -1,3 +1,4 @@
+using Core;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -5,12 +6,12 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class WeatherForecastController : AuthController
+public class TestController(ICurrentUser currentUser) : AuthController
 {
     [HttpGet(Name = "Test")]
     public async Task<IActionResult> Get()
     {
-        var result = await Mediator.Send(new TestMediatrCommand("Test"));
+        var result = await Mediator.Send(new TestMediatrCommand(await currentUser.Id()));
         return Ok(result);
     }
 }
