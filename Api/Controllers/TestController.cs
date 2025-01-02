@@ -1,4 +1,5 @@
 using Api.Controllers.Framework;
+using Api.Framework;
 using Core;
 using FluentValidation;
 using MediatR;
@@ -26,6 +27,15 @@ public class TestMediatrValidator : AbstractValidator<TestMediatrCommand>
     {
         RuleFor(v => v.Title)
             .NotEmpty();
+    }
+}
+
+// ReSharper disable once UnusedType.Global
+public class TestMediatrAuthoriser : IAuthoriser<TestMediatrCommand>
+{
+    public Task<bool> Authorise(TestMediatrCommand request)
+    {
+        return Task.FromResult(true);
     }
 }
 

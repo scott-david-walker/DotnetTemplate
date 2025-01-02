@@ -2,6 +2,7 @@ using System.Reflection;
 using Api;
 using Api.Behaviours;
 using Api.Controllers.Framework;
+using Api.Framework;
 using Api.Settings;
 using Core;
 using Core.Entities;
@@ -27,7 +28,14 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorisationBehaviour<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<IAuthoriser>()
+    .AddClasses(classes => classes.AssignableTo<IAuthoriser>())
+    .AsImplementedInterfaces()
+    .WithTransientLifetime());
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql("Host=localhost;Database=database;Username=postgres;Password=password;Include Error Detail = true"));
