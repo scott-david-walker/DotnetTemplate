@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Api.Application.UseCases.Account;
 using Api.Controllers.Framework;
 using Api.Framework.Constants;
 using Api.Settings;
 using Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -44,5 +46,13 @@ public class AccountController(JwtSettings jwtSettings, UserManager<User> userMa
         var tokenString = tokenHandler.WriteToken(token);
 
         return Ok(new { Token = tokenString });
+    }
+    
+    [Authorize]
+    [HttpGet("loggedInUser")]
+    public async Task<IActionResult> GetLoggedInUser()
+    {
+        var result = await Mediator.Send(new GetLoggedInUserQuery());
+        return Ok(result);
     }
 }

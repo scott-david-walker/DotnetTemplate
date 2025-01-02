@@ -41,4 +41,5 @@ public class NotFoundException : DomainException
     /// <typeparam name="T">Type of the object that was not found</typeparam>
     /// <param name="id">An identifier which is the identifier of the resource that was not found</param>
     public static NotFoundException ForType<T>(string id) => new(id, typeof(T));
+    
 }
