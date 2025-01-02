@@ -1,7 +1,7 @@
 using System.Reflection;
-using System.Text;
 using Api;
 using Api.Behaviours;
+using Api.Controllers.Framework;
 using Api.Settings;
 using Core;
 using Core.Entities;
@@ -66,6 +66,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    ExceptionHandlingPath = new($"/{ExceptionHandlerController.Route}"),
+    AllowStatusCode404Response = true
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
