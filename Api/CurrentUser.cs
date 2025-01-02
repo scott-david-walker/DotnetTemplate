@@ -1,30 +1,14 @@
 using System.Security.Claims;
+using Api.Framework.Constants;
 using Core;
-using Core.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace Api;
 
 public class CurrentUser(
-    IHttpContextAccessor httpContextAccessor,
-    UserManager<User> userManager)
+    IHttpContextAccessor httpContextAccessor)
     : ICurrentUser
 {
-    private readonly ClaimsPrincipal _contextUser = httpContextAccessor!.HttpContext!.User;
-    private User? _user;
-
-    private async Task<User> GetUser()
-    {
-        if (_user != null)
-        {
-            return _user;
-        }
-        _user = await userManager.FindByNameAsync(_contextUser.Identity!.Name!);
-        return _user!;
-    }
-    public async Task<string> Id()
-    {
-        var user = await GetUser();
-        return user.Id;
-    }
+    private readonly ClaimsPrincipal _contextUser = httpContextAccessor.HttpContext!.User;
+    public string Email => _contextUser.FindFirstValue(ClaimTypes.Name)!;
+    public string Id => _contextUser.FindFirstValue(CustomClaimTypes.IdClaim)!;
 }

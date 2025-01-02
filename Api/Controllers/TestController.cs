@@ -14,7 +14,7 @@ public class TestController(ICurrentUser currentUser) : AuthController
     [HttpGet(Name = "Test")]
     public async Task<IActionResult> Get()
     {
-        var result = await Mediator.Send(new TestMediatrCommand(await currentUser.Id()));
+        var result = await Mediator.Send(new TestMediatrCommand(currentUser.Email));
         return Ok(result);
     }
 }

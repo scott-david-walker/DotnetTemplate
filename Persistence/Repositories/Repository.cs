@@ -5,15 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Persistence.Repositories;
 
 
-public abstract class Repository<T> : IRepository<T> where T : class
+public abstract class Repository<T>(ApplicationDbContext context) : IRepository<T>
+    where T : class
 {
-    private readonly DbSet<T> _table;
-    private readonly ApplicationDbContext _context;
-    protected Repository(ApplicationDbContext context)
-    {
-        _context = context;
-        _table = context.Set<T>();
-    }
+    private readonly DbSet<T> _table = context.Set<T>();
 
     public virtual async Task<IEnumerable<T>> Get()
     {
@@ -44,13 +39,11 @@ public abstract class Repository<T> : IRepository<T> where T : class
         //First attach the object to the table
         _table.Attach(obj);
         //Then set the state of the Entity as Modified
-        _context.Entry(obj).State = EntityState.Modified;
+        context.Entry(obj).State = EntityState.Modified;
     }
     
     public virtual async Task Delete(Guid id)
     {
-        //First, fetch the record from the table
-
         var existing = await Get(id);
         _table.Remove(existing);
     }

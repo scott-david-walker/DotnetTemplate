@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Api.Controllers.Framework;
+using Api.Framework.Constants;
 using Api.Settings;
 using Core.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +32,8 @@ public class AccountController(JwtSettings jwtSettings, UserManager<User> userMa
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new([
-                new(ClaimTypes.Name, user.UserName)
+                new(ClaimTypes.Name, user.UserName),
+                new(CustomClaimTypes.IdClaim, user.Id)
             ]),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new(new SymmetricSecurityKey(jwtSettings.GetKey()), SecurityAlgorithms.HmacSha256Signature),

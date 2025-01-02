@@ -2,5 +2,6 @@ namespace Core;
 
 public interface ICurrentUser
 {
-    Task<string> Id();
+    string Id { get; }
+    string Email { get; }
 }
