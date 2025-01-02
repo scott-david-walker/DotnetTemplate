@@ -1,3 +1,4 @@
+using Api.Behaviours;
 using Api.Controllers.Framework;
 using Api.Framework;
 using Core;
@@ -18,7 +19,7 @@ public class TestController(ICurrentUser currentUser) : AuthController
     }
 }
 
-public record TestMediatrCommand(string Title) : IRequest<Guid>;
+public record TestMediatrCommand(string Title) : IRequest<Guid>, ICommand;
 
 // ReSharper disable once UnusedType.Global
 public class TestMediatrValidator : AbstractValidator<TestMediatrCommand>

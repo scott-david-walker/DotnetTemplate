@@ -7,13 +7,10 @@ namespace Persistence.Repositories;
 
 public abstract class Repository<T> : IRepository<T> where T : class
 {
-    public IUnitOfWork UnitOfWork { get; }
     private readonly DbSet<T> _table;
     private readonly ApplicationDbContext _context;
-    protected Repository(IUnitOfWork unitOfWork)
+    protected Repository(ApplicationDbContext context)
     {
-        UnitOfWork = unitOfWork;
-        var context = (ApplicationDbContext)unitOfWork;
         _context = context;
         _table = context.Set<T>();
     }
