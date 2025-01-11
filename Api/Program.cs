@@ -24,6 +24,14 @@ builder.Services.AddIdentityApiEndpoints<User>()
 
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
+builder.Services.AddCors( options =>
+{
+    options.AddPolicy("all",
+        policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,6 +39,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("all");
 }
 
 app.UseExceptionHandler(new ExceptionHandlerOptions
