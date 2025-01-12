@@ -1,0 +1,66 @@
+name: Deploy
+on: workflow_dispatch
+
+permissions:
+  id-token: write
+  contents: write
+  checks: write
+  packages: write
+  pull-requests: write
+  actions: write
+
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Needed for gitversion
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: '5.x'
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.15
+        with:
+          useConfigFile: true
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ env.GitVersion_SemVer }}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+      - name: Build Container
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: false
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Create Tag
+        if: github.ref_name == 'main'
+        uses: negz/create-tag@v1
+        with:
+          version: ${{ env.GitVersion_SemVer }}
+          message: 'Auto tagging version ${{ env.GitVersion_SemVer }}'
+          token: ${{ secrets.GITHUB_TOKEN }}
